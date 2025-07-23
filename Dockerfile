@@ -3,9 +3,12 @@ WORKDIR /app
 COPY . .
 RUN npm install && npm run build
  
-FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
+
+FROM node:18-alpine As build
+RUN npm install -g serve
+WORKDIR /app
+COPY .. --from=build /app/build ./build
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["serve", "-s","build","-I","8080"]
  
  
