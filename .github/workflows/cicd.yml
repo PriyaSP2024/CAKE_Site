@@ -40,9 +40,9 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}  # SSH username
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  # EC2 private key
-          source: "."  # Copy everything in the current folder
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."                             # Copy everything in the repo
           target: "/home/${{ secrets.SERVER_USER }}/cake-deployment"
 
       - name: Deploy on server
@@ -58,5 +58,3 @@ jobs:
             docker-compose down || true
             docker-compose up -d --build
             echo "✅ Deployment complete."
-
- 
