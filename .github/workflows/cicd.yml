@@ -1,60 +1,62 @@
 name: CI/CD Pipeline
- 
+
 on:
- push:
-  branches:
-     - main 
- 
+  push:
+    branches:
+      - main
+
 jobs:
-build-test-deploy:    
-  runs-on: ubuntu-latest  
- 
-  steps:       
-   - name: Checkout source code     
-    uses: actions/checkout@v3
- 
-    - name: Set up Node.js  
- 
-    uses: actions/setup-node@v3
-    with:
-      node-version: 18
- 
-   - name: Install frontend dependencies & build
-    run: |
-      echo "📦 Installing dependencies..."  
-      npm install
-      echo "⚙️ Building React app..."
-      npm run build     
- 
-   - name: Echo IP to verify secret update
-    run: 'echo "Using SonarQube IP: http://${{ secrets.SERVER_IP }}:9000"'  
- 
-   - name: SonarQube Scan   
-    uses: sonarsource/sonarqube-scan-action@v2
-    with:
-      projectBaseDir: . 
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      SONAR_HOST_URL: http://${{ secrets.SERVER_IP }}:9000   
-   - name: Upload full project to server       
-    uses: appleboy/scp-action@master
-    with:
-      host: ${{ secrets.SERVER_IP }}  
-      username: ${{ secrets.SERVER_USER }} – ssh username 
-      key: ${{ secrets.SSH_PRIVATE_KEY }} – ec2 private key
-      source: .  -  copy everthing in the current folde – ur repo
-      target: /home/${{ secrets.SERVER_USER }}/cake-deployment 
-   - name: Deploy on server
-    uses: appleboy/ssh-action@master
-    with:
-      host: ${{ secrets.SERVER_IP }}
-      username: ${{ secrets.SERVER_USER }}
-      key: ${{ secrets.SSH_PRIVATE_KEY }}
-      script: |
-        set -e
-        echo "🚀 Deploying container..."
-        cd cake-deployment
-        docker-compose down || true
-        docker-compose up -d --build 
-        echo "✅ Deployment complete."
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install frontend dependencies & build
+        run: |
+          echo "📦 Installing dependencies..."  
+          npm install
+          echo "⚙️ Building React app..."
+          npm run build
+
+      - name: Echo IP to verify secret update
+        run: echo "Using SonarQube IP: http://${{ secrets.SERVER_IP }}:9000"
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v2
+        with:
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: http://${{ secrets.SERVER_IP }}:9000
+
+      - name: Upload full project to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}  # SSH username
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # EC2 private key
+          source: "."  # Copy everything in the current folder
+          target: "/home/${{ secrets.SERVER_USER }}/cake-deployment"
+
+      - name: Deploy on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            echo "🚀 Deploying container..."
+            cd cake-deployment
+            docker-compose down || true
+            docker-compose up -d --build
+            echo "✅ Deployment complete."
+
  
