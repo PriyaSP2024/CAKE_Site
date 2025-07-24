@@ -10,7 +10,7 @@ on:
 
 env:
 
-  DOCKER_IMAGE: docker.io/PriyaSP2024/cake-app:V2
+  DOCKER_IMAGE: docker.io/priya2025/cake-app:V2
 
   AWS_REGION: us-east-2
 
